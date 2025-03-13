@@ -3,7 +3,7 @@ name: deploy order order-backend
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   build-and-deploy:
@@ -32,18 +32,34 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: build and push docker image to ecr
+      - name: order build and push docker image to ecr
         env:
           REGISTRY: 346903264902.dkr.ecr.ap-northeast-2.amazonaws.com
-          REPOSITORY: js-ns/js-order-backend
+          REPOSITORY: js-msa-order
           IMAGE_TAG: latest
         run: |
           docker build \
           -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
-          -f ./4.order_system/Dockerfile ./4.order_system
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          -f ./5.msa/ordering/Dockerfile ./5.msa/ordering
+           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: eks kubectl apply
         run: |
-          kubectl apply -f ./4.order_system/k8s/depl_svc.yml
-          kubectl rollout restart deployment js-order-backend -n js-ns
+          kubectl apply -f ./5.msa/ordering/k8s/depl_svc.yml
+          kubectl rollout restart deployment js-msa-ordering-depl -n js-ns
+
+      - name: product build and push docker image to ecr
+        env:
+          REGISTRY: 346903264902.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: js-msa-product
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./5.msa/product/Dockerfile ./5.msa/product
+           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./5.msa/product/k8s/depl_svc.yml
+          kubectl rollout restart deployment js-msa-product-depl -n js-ns

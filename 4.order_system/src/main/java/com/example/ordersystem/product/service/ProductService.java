@@ -53,40 +53,41 @@ public class ProductService {
     }
 
     public Product productCreate(ProductRegisterDto dto) {
-        try {
-            // member 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Member member = memberRepository.findByEmail(authentication.getName())
-                    .orElseThrow(() -> new EntityNotFoundException("member is not found"));
+        // try {
+        //     // member 조회
+        //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //     Member member = memberRepository.findByEmail(authentication.getName())
+        //             .orElseThrow(() -> new EntityNotFoundException("member is not found"));
 
-            Product product = productRepository.save(dto.toEntity(member));
+        //     Product product = productRepository.save(dto.toEntity(member));
 
-            // redis 재고에 추가
-            stockInventoryService.increseStock(product.getId(), dto.getStockQuantity());
+        //     // redis 재고에 추가
+        //     stockInventoryService.increseStock(product.getId(), dto.getStockQuantity());
 
-            // aws에 image 저장 후 url 추출
-            MultipartFile image = dto.getProductImage();
-            byte[] bytes = image.getBytes();
-            String fileName = product.getId() + "_" + image.getOriginalFilename();
+        //     // aws에 image 저장 후 url 추출
+        //     MultipartFile image = dto.getProductImage();
+        //     byte[] bytes = image.getBytes();
+        //     String fileName = product.getId() + "_" + image.getOriginalFilename();
 
-            // S3 업로드 요청 객체 생성
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(fileName)
-                    .build();
+        //     // S3 업로드 요청 객체 생성
+        //     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        //             .bucket(bucket)
+        //             .key(fileName)
+        //             .build();
 
-            // S3에 바이트 배열을 바로 업로드
-            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
+        //     // S3에 바이트 배열을 바로 업로드
+        //     s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
-            // S3 URL 추출 후 업데이트
-            String s3Url = s3Client.utilities().getUrl(a -> a.bucket(bucket).key(fileName)).toExternalForm();
-            product.updateImagePath(s3Url);
+        //     // S3 URL 추출 후 업데이트
+        //     String s3Url = s3Client.utilities().getUrl(a -> a.bucket(bucket).key(fileName)).toExternalForm();
+        //     product.updateImagePath(s3Url);
 
-            return product;
-        } catch (IOException e) {
-            // redis는 트랜잭션의 대상이 아니므로, 에러 시 별도의 decrease 작업 필요
-            throw new RuntimeException("이미지 저장 실패", e);
-        }
+        //     return product;
+        // } catch (IOException e) {
+        //     // redis는 트랜잭션의 대상이 아니므로, 에러 시 별도의 decrease 작업 필요
+        //     throw new RuntimeException("이미지 저장 실패", e);
+        // }
+        return null;
     }
 
     public Page<ProductResDto> findAll(Pageable pageable, ProductSerchDto serchDto) {
