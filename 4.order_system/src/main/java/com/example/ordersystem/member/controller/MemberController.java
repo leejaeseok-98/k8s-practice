@@ -105,5 +105,10 @@ public class MemberController {
         return new ResponseEntity<>(loginInfo, HttpStatus.OK);
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("ok");
+    }
+
 
 }
