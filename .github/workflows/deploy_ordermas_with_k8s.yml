@@ -32,6 +32,22 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: member build and push docker image to ecr
+        env:
+          REGISTRY: 346903264902.dkr.ecr.ap-northeast-2.amazonaws.com
+          REPOSITORY: js-msa-member
+          IMAGE_TAG: latest
+        run: |
+          docker build \
+          -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+          -f ./5.msa/member/Dockerfile ./5.msa/member
+           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl apply
+        run: |
+          kubectl apply -f ./5.msa/product/k8s/depl_svc.yml
+          kubectl rollout restart deployment js-msa-product-depl -n js-ns
+
       - name: order build and push docker image to ecr
         env:
           REGISTRY: 346903264902.dkr.ecr.ap-northeast-2.amazonaws.com

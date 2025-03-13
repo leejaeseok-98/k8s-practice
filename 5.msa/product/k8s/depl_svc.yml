@@ -4,7 +4,7 @@ metadata:
   name: js-msa-product-depl
   namespace: js-ns
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: js-msa-product
