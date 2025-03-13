@@ -15,7 +15,7 @@ spring:
       ddl-auto: create
     show_sql: true
   kafka:
-    kafka-servers: kafka-service:9092
+    kafka-server: kafka-service:9092
     consumer:
       group-id: product-group
       auto-offset-reset: earliest
