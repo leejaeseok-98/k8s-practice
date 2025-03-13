@@ -92,9 +92,6 @@ public class OrderingService {
         for (OrderCreateDto o : dtos) {
 //            product서버에 feign클라이언트를 통한 api요청 조회
             ProductDto productDto = productFeign.getProductById(o.getProductId());
-
-
-
             int quantity = o.getProductCount();
             if ( productDto.getStockQuantity() <quantity) {
                 throw new IllegalArgumentException("재고 부족");
@@ -108,9 +105,6 @@ public class OrderingService {
                         .productId(o.getProductId()).productQuantity(o.getProductCount())
                         .build();
                 kafkaTemplate.send("update-stock-topic", dto);
-
-
-
             }
 
             OrderDetail orderDetail = OrderDetail.builder()
